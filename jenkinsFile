@@ -7,7 +7,7 @@ pipeline {
         stage('Checkout code')
         {
             steps {
-                git branch: 'master', url: 'https://github.com/asmamh1/country-service.git'
+                checkout scm
             }
         }
         stage('Compile code')
@@ -19,18 +19,26 @@ pipeline {
         stage('Test code')
         {
             steps {
-                sh 'mvn test '
+                sh 'mvn test'
             }
-            post{
-                success {
-                    junit allowEmptyResults: true, testResults: '**/target/surfire-reports/*.xml'
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+        stage('SonarQube analysis')
+        {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=country-service -Dsonar.projectName=country-service'
                 }
             }
         }
         stage('Package code')
         {
             steps {
-                sh 'mvn package '
+                sh 'mvn package -DskipTests'
             }
         }
     }
