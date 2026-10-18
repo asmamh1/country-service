@@ -46,5 +46,29 @@ pipeline {
                 sh 'mvn deploy -DskipTests'
             }
         }
+        stage('Package reports') {
+            steps {
+                sh '''
+                  cd target
+                  zip -r jacoco-report.zip site/jacoco
+                  zip -r surefire-reports.zip surefire-reports
+                '''
+            }
+        }
+        stage('Deploy reports') {
+            steps {
+                sh '''
+                  mvn deploy:deploy-file -DgroupId=com.country-service -DartifactId=country-service-jacoco \
+                    -Dversion=0.0.1-SNAPSHOT -Dpackaging=zip -Dfile=target/jacoco-report.zip \
+                    -DrepositoryId=nexus -Durl=http://localhost:8083/repository/maven-snapshots/
+
+                  mvn deploy:deploy-file -DgroupId=com.country-service -DartifactId=country-service-surefire \
+                    -Dversion=0.0.1-SNAPSHOT -Dpackaging=zip -Dfile=target/surefire-reports.zip \
+                    -DrepositoryId=nexus -Durl=http://localhost:8083/repository/maven-snapshots/
+                '''
+            }
+        }
+
+
     }
 }
