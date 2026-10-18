@@ -9,5 +9,6 @@ class CountryServiceApplicationTests {
 	@Test
 	void contextLoads() {
 	}
+	System.out.println("Bonjour !");
 
 }
