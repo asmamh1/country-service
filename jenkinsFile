@@ -20,10 +20,19 @@ pipeline {
         {
             steps {
                 sh 'docker build . -t my-country-service:$BUILD_NUMBER '
-                withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-                    sh 'docker login -u asmamh -p ${dockerhubpwd}'
-                }
-                sh 'docker tag my-country-service:$BUILD_NUMBER jamina2385/my-country-service:$BUILD_NUMBER'
+                withCredentials([
+                    string(
+                        credentialsId: 'dockerhub-token',
+                        variable: 'dockerhubpwd'
+                    )
+                ]) {
+                sh '''
+                    set +x
+                    printf '%s' "$dockerhubpwd" |
+                        docker login --username asmamh --password-stdin
+                '''
+            }
+                sh 'docker tag my-country-service:$BUILD_NUMBER asmamh/my-country-service:$BUILD_NUMBER'
                 sh 'docker push asmamh/my-country-service:$BUILD_NUMBER'
             }
         }
