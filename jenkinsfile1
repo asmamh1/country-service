@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+    tools {
+        maven 'M2_HOME'
+    }
+    environment {
+        IMAGE = 'asmamh/country-service'
+    }
+    stages {
+        stage('Checkout code')
+        {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build maven')
+        {
+            steps {
+                sh 'mvn clean package'
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+        stage('Build Docker image')
+        {
+            steps {
+                sh 'docker build -t $IMAGE:$BUILD_NUMBER -t $IMAGE:latest .'
+            }
+        }
+        stage('Push to Docker Hub')
+        {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
+                    sh 'echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin'
+                    sh 'docker push $IMAGE:$BUILD_NUMBER'
+                    sh 'docker push $IMAGE:latest'
+                }
+            }
+        }
+        stage('Deploy micro-service')
+        {
+            steps {
+                sh 'docker rm -f country-service || true'
+                sh 'docker run -d --name country-service -p 8082:8082 $IMAGE:$BUILD_NUMBER'
+            }
+        }
+    }
+}
