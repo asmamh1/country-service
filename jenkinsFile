@@ -42,8 +42,8 @@ pipeline {
         }
         stage('Deploy micro-service') {
             steps {
-                sh 'docker rm -f my-country-service || true'
-                sh 'docker run -d --name my-country-service -p 8082:8082 asmamh/my-country-service:$BUILD_NUMBER'
+                sh 'docker rm -f $(docker ps -aq) || true'
+                sh 'docker run -d -p 8082:8082 asmamh/my-country-service:$BUILD_NUMBER'
             }
         }
     }
