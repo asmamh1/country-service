@@ -32,8 +32,12 @@ pipeline {
                         docker login --username asmamh --password-stdin
                 '''
             }
-                sh 'docker tag my-country-service:$BUILD_NUMBER asmamh/my-country-service:$BUILD_NUMBER'
-                sh 'docker push asmamh/my-country-service:$BUILD_NUMBER'
+                
+            sh '''
+                docker tag my-country-service:4 asmamh/my-country-service:4
+                docker push asmamh/my-country-service:4
+            '''
+
             }
         }
         stage('Deploy micro-service')
