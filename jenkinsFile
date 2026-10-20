@@ -1,49 +1,44 @@
 pipeline {
     agent any
     tools {
-        maven 'M2-HOME'
+        maven 'M2_HOME'
     }
     stages {
         stage('Checkout code')
         {
             steps {
-                git branch: 'master', url: 'https://github.com/asmamh1/country-service.git'
+                checkout scm
             }
         }
-        stage('Build maven')
+        stage('Compile code')
         {
             steps {
-                sh 'mvn clean install'
+                sh 'mvn compile'
             }
         }
-        stage('Build Dockerfile ')
+        stage('Test code')
         {
             steps {
-                sh 'docker build . -t my-country-service:$BUILD_NUMBER '
-                withCredentials([
-                    string(
-                        credentialsId: 'dockerhub-token',
-                        variable: 'dockerhubpwd'
-                    )
-                ]) {
-                sh '''
-                    set +x
-                    printf '%s' "$dockerhubpwd" |
-                        docker login --username asmamh --password-stdin
-                '''
+                sh 'mvn test'
             }
-                
-            sh '''
-                docker tag my-country-service:4 asmamh/my-country-service:4
-                docker push asmamh/my-country-service:4
-            '''
-
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                }
             }
         }
-        stage('Deploy micro-service') {
+        stage('SonarQube analysis')
+        {
             steps {
-                sh 'docker rm -f $(docker ps -aq) || true'
-                sh 'docker run -d -p 8082:8082 asmamh/my-country-service:$BUILD_NUMBER'
+                withSonarQubeEnv('sonarqube') {
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=country-service -Dsonar.projectName=country-service'
+                }
+            }
+        }
+        stage('Package code')
+        {
+            steps {
+                sh 'mvn package -DskipTests'
             }
         }
     }
