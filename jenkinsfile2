@@ -1,70 +1,36 @@
-
 pipeline {
     agent any
-
     tools {
-        maven 'M2_HOME'
+        maven 'M2-HOME'
     }
-
-    environment {
-        DOCKER_USER = 'asmamh'
-        IMAGE_NAME  = 'my-country-service-deployement'
-    }
-
     stages {
-        stage('Checkout code') {
+        stage('Checkout code')
+        {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/asmamh1/country-service.git'
+                git branch: 'master', url: 'https://github.com/asmamh1/country-service.git'
             }
         }
-
-        stage('Build maven') {
+        stage('Build maven')
+        {
             steps {
                 sh 'mvn clean install'
             }
         }
-
-        stage('Build Dockerfile') {
+        stage('Build Dockerfile ')
+        {
             steps {
-                // Build the image
-                sh 'docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .'
-
-                // Login to Docker Hub
-                withCredentials([
-                    string(
-                        credentialsId: 'dockerhub-pwd',
-                        variable: 'dockerhubpwd'
-                    )
-                ]) {
-                    sh '''
-                        echo "$dockerhubpwd" |
-                        docker login -u "$DOCKER_USER" --password-stdin
-                    '''
+                sh 'docker build . -t my-country-service:$BUILD_NUMBER '
+                withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                    sh 'docker login -u asmamh -p ${dockerhubpwd}'
                 }
-
-                // Tag the image for Docker Hub
-                sh '''
-                    docker tag \
-                        "${IMAGE_NAME}:${BUILD_NUMBER}" \
-                        "${DOCKER_USER}/${IMAGE_NAME}:${BUILD_NUMBER}"
-                '''
-
-                // Push the image
-                sh '''
-                    docker push \
-                        "${DOCKER_USER}/${IMAGE_NAME}:${BUILD_NUMBER}"
-                '''
+                sh 'docker tag my-country-service:$BUILD_NUMBER jamina2385/my-country-service:$BUILD_NUMBER'
+                sh 'docker push asmamh/my-country-service:$BUILD_NUMBER'
             }
         }
-
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    kubeconfig(
-                        credentialsId: 'kubeconfig-file',
-                        serverUrl: ''
-                    ) {
+                    kubeconfig(credentialsId: 'kubeconfig-file', serverUrl: '') {
                         sh 'kubectl apply -f deployment.yaml'
                         sh 'kubectl apply -f service.yaml'
                     }
