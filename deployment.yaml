@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: country-service-container
-          image: my-country-service:v1
+          image: asmamh/my-country-service:1
           ports:
             - containerPort: 8082
