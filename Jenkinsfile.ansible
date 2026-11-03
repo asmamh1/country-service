@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    tools {
+        maven 'mymaven'   // adapte au nom de ton outil Maven dans Jenkins
+    }
+    stages {
+        stage('Checkout code') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build maven') {
+            steps {
+                sh 'mvn clean install -DskipTests'
+            }
+        }
+        stage('Deploy using Ansible playbook') {
+            steps {
+                sh 'ansible-playbook -i hosts playbookCICD.yml --vault-password-file /var/lib/jenkins/.vault_pass'
+            }
+        }
+    }
+    post {
+        always  { cleanWs() }
+        success { echo 'Ansible playbook executed successfully!' }
+        failure { echo 'Ansible playbook execution failed!' }
+    }
+}
