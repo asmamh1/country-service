@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        maven 'mymaven'   // adapte au nom de ton outil Maven dans Jenkins
+        maven 'M2-HOME'   // adapte au nom de ton outil Maven dans Jenkins
     }
     stages {
         stage('Checkout code') {
