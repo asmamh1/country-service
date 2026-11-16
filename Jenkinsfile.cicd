@@ -46,7 +46,7 @@ pipeline {
         //   Ansible --(Deployment)--> Kubernetes --(Pull Image)--> Docker Hub
         stage('Deploy (Ansible -> Docker Hub -> Kubernetes)') {
             steps {
-                sh 'ansible-playbook -i hosts playbookCICD.yml --vault-password-file /var/lib/jenkins/.vault_pass'
+                sh 'ansible-playbook -i hosts playbookCICD.yml --vault-password-file /var/lib/jenkins/.vault_pass -e build_number=$BUILD_NUMBER'
             }
         }
     }
