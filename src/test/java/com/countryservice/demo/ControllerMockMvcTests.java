@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ControllerMockMvcTests {
+class ControllerMockMvcTests {
 
 	MockMvc mockMvc;
 
@@ -43,17 +43,17 @@ public class ControllerMockMvcTests {
 	@InjectMocks
 	CountryController countryController;
 
-	public List<Country> mycountries;
+	List<Country> mycountries;
 	Country country;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		mockMvc = MockMvcBuilders.standaloneSetup(countryController).build();
 	}
 
 	@Test
 	@Order(1)
-	public void test_getAllCountries() throws Exception {
+	void test_getAllCountries() throws Exception {
 		mycountries = new ArrayList<Country>();
 		mycountries.add(new Country(1, "India", "Delhi"));
 		mycountries.add(new Country(2, "USA", "Washington"));
@@ -67,7 +67,7 @@ public class ControllerMockMvcTests {
 
 	@Test
 	@Order(2)
-	public void test_getCountryByID() throws Exception {
+	void test_getCountryByID() throws Exception {
 		country = new Country(1, "India", "Delhi");
 		int countryID = 1;
 		when(countryService.getCountryById(countryID)).thenReturn(country);
@@ -82,7 +82,7 @@ public class ControllerMockMvcTests {
 
 	@Test
 	@Order(3)
-	public void test_getCountryByName() throws Exception {
+	void test_getCountryByName() throws Exception {
 		country = new Country(1, "India", "Delhi");
 		String countryName = "India";
 		when(countryService.getCountryByName(countryName)).thenReturn(country);
@@ -97,7 +97,7 @@ public class ControllerMockMvcTests {
 
 	@Test
 	@Order(4)
-	public void test_addCountry() throws Exception {
+	void test_addCountry() throws Exception {
 		country = new Country(3, "Germany", "Berlin");
 
 		when(countryService.addCountry(any(Country.class))).thenReturn(country);
@@ -114,7 +114,7 @@ public class ControllerMockMvcTests {
 
 	@Test
 	@Order(5)
-	public void test_updateCountry() throws Exception {
+	void test_updateCountry() throws Exception {
 		country = new Country(3, "Japan", "Tokyo");
 		int countryID = 3;
 
@@ -135,7 +135,7 @@ public class ControllerMockMvcTests {
 
 	@Test
 	@Order(6)
-	public void test_deleteCountry() throws Exception {
+	void test_deleteCountry() throws Exception {
 		country = new Country(3, "Japan", "Tokyo");
 		int countryID = 3;
 

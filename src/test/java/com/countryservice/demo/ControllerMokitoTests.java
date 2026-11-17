@@ -1,6 +1,7 @@
 package com.countryservice.demo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -19,11 +20,12 @@ import org.springframework.http.ResponseEntity;
 
 import com.countryservice.demo.beans.Country;
 import com.countryservice.demo.controllers.CountryController;
+import com.countryservice.demo.dto.CountryDTO;
 import com.countryservice.demo.services.CountryService;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ControllerMokitoTests {
+class ControllerMokitoTests {
 
 	@Mock
 	CountryService countryService;
@@ -31,12 +33,12 @@ public class ControllerMokitoTests {
 	@InjectMocks
 	CountryController countryController;
 
-	public List<Country> mycountries;
+	List<Country> mycountries;
 	Country country;
 
 	@Test
 	@Order(1)
-	public void test_getAllCountries() {
+	void test_getAllCountries() {
 		mycountries = new ArrayList<Country>();
 		mycountries.add(new Country(1,"India","Delhi"));
 		mycountries.add(new Country(2,"USA","Washington"));
@@ -51,7 +53,7 @@ public class ControllerMokitoTests {
 
 	@Test
 	@Order(2)
-	public void test_getCountryByID() {
+	void test_getCountryByID() {
 		country = new Country(1,"India","Delhi");
 
 		int countryID=1;
@@ -65,7 +67,7 @@ public class ControllerMokitoTests {
 
 	@Test
 	@Order(3)
-	public void test_getCountryByName() {
+	void test_getCountryByName() {
 		country = new Country(1,"India","Delhi");
 
 		String countryName="India";
@@ -79,11 +81,11 @@ public class ControllerMokitoTests {
 
 	@Test
 	@Order(4)
-	public void test_addCountry() {
+	void test_addCountry() {
 		country = new Country(3,"Germany","Berlin");
 
-		when(countryService.addCountry(country)).thenReturn(country);//Mocking
-		ResponseEntity<Country> res = countryController.addCountry(country);
+		when(countryService.addCountry(any(Country.class))).thenReturn(country);//Mocking
+		ResponseEntity<Country> res = countryController.addCountry(new CountryDTO(3,"Germany","Berlin"));
 
 		assertEquals(HttpStatus.CREATED, res.getStatusCode());
 		assertEquals(country, res.getBody());
@@ -92,14 +94,14 @@ public class ControllerMokitoTests {
 
 	@Test
 	@Order(5)
-	public void test_updateCountry() {
+	void test_updateCountry() {
 		country = new Country(3,"Japan","Tokyo");
 		int countryID = 3;
 
 		when(countryService.getCountryById(countryID)).thenReturn(country);//Mocking
 		when(countryService.updateCountry(country)).thenReturn(country);//Mocking
 
-		ResponseEntity<Country> res = countryController.updateCountry(countryID, country);
+		ResponseEntity<Country> res = countryController.updateCountry(countryID, new CountryDTO(3,"Japan","Tokyo"));
 
 		assertEquals(HttpStatus.OK, res.getStatusCode());
 		assertEquals("Japan", res.getBody().getName());
@@ -109,7 +111,20 @@ public class ControllerMokitoTests {
 
 	@Test
 	@Order(6)
-	public void test_deleteCountry() {
+	void test_updateCountry_notFound() {
+		int countryID = 99;
+
+		when(countryService.getCountryById(countryID)).thenReturn(null);//Mocking
+
+		ResponseEntity<Country> res = countryController.updateCountry(countryID, new CountryDTO(99,"Narnia","Cair Paravel"));
+
+		assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+
+	}
+
+	@Test
+	@Order(7)
+	void test_deleteCountry() {
 		country = new Country(3,"Japan","Tokyo");
 		int countryID = 3;
 

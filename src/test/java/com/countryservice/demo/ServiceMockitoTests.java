@@ -23,7 +23,7 @@ import com.countryservice.demo.services.CountryService;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ServiceMockitoTests {
+class ServiceMockitoTests {
 
 	@Mock
 	CountryRepository countryrep;
@@ -33,7 +33,7 @@ public class ServiceMockitoTests {
 
 	@Test
 	@Order(1)
-	public void test_getAllCountries() {
+	void test_getAllCountries() {
 		List<Country> mycountries = new ArrayList<Country>();
 		mycountries.add(new Country(1, "India", "Delhi"));
 		mycountries.add(new Country(2, "USA", "Washington"));
@@ -44,7 +44,7 @@ public class ServiceMockitoTests {
 
 	@Test
 	@Order(2)
-	public void test_getCountryByID() {
+	void test_getCountryByID() {
 		List<Country> mycountries = new ArrayList<Country>();
 		mycountries.add(new Country(1, "India", "Delhi"));
 		mycountries.add(new Country(2, "USA", "Washington"));
@@ -56,7 +56,7 @@ public class ServiceMockitoTests {
 
 	@Test
 	@Order(3)
-	public void test_getCountryByName() {
+	void test_getCountryByName() {
 		List<Country> mycountries = new ArrayList<Country>();
 		mycountries.add(new Country(1, "India", "Delhi"));
 		mycountries.add(new Country(2, "USA", "Washington"));
@@ -68,7 +68,7 @@ public class ServiceMockitoTests {
 
 	@Test
 	@Order(4)
-	public void test_addCountry() {
+	void test_addCountry() {
 		Country country = new Country(3, "France", "Paris");
 		when(countryrep.save(country)).thenReturn(country); // Mocking
 		assertEquals(country, countryService.addCountry(country));
@@ -76,7 +76,7 @@ public class ServiceMockitoTests {
 
 	@Test
 	@Order(5)
-	public void test_updateCountry() {
+	void test_updateCountry() {
 		Country country = new Country(3, "Germany", "Berlin");
 		when(countryrep.save(country)).thenReturn(country); // Mocking
 		assertEquals(country, countryService.updateCountry(country));
@@ -84,7 +84,7 @@ public class ServiceMockitoTests {
 
 	@Test
 	@Order(6)
-	public void test_deleteCountry() {
+	void test_deleteCountry() {
 		Country country = new Country(3, "Germany", "Berlin");
 		countryService.deleteCountry(country);
 		verify(countryrep, times(1)).delete(country);
