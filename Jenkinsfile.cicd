@@ -51,7 +51,7 @@ pipeline {
         }
     }
     post {
-        success { echo 'Pipeline CI/CD terminé avec succès' }
+        success { echo 'Pipeline CI/CD terminé avec succès !' }
         failure { echo 'Le pipeline a échoué' }
     }
 }
